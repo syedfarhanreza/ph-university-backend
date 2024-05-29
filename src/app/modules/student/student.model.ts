@@ -7,8 +7,6 @@ import {
   TUsername,
   TlocalGuardian,
 } from './student.interface';
-import bcrypt from 'bcrypt';
-import config from '../../config';
 
 const userNameSchema = new Schema<TUsername>({
   firstName: {
@@ -98,10 +96,11 @@ const localGuardianSchema = new Schema<TlocalGuardian>({
 const studentSchema = new Schema<TStudent, StudentModel>(
   {
     id: { type: String, required: [true, 'Id is required'], unique: true },
-    password: {
-      type: String,
-      required: [true, 'Password is required'],
-      maxlength: [20, 'Password can not be more than 20 characters'],
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'Id is required'],
+      unique: true,
+      ref: 'User',
     },
     name: {
       type: userNameSchema,
@@ -115,15 +114,11 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       },
       required: true,
     },
-    dateOfBirth: { type: String },
+    dateOfBirth: { type: Date },
     email: {
       type: String,
       required: [true, 'Email is required'],
       unique: true,
-      // validate: {
-      //   validator: (value: string) => validator.isEmail(value),
-      //   message: '{VALUE} is not valid email',
-      // },
     },
     contactNo: { type: String, required: true },
     emergencyContactNo: { type: String, required: true },
@@ -142,10 +137,9 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: true,
     },
     profileImg: { type: String },
-    isActive: {
-      type: String,
-      enum: ['active', 'blocked'],
-      default: 'active',
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicSemester',
     },
     isDeleted: {
       type: Boolean,
@@ -162,25 +156,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 // virtual
 studentSchema.virtual('fullName').get(function () {
   return `${this.name.firstName}  ${this.name.middleName} ${this.name.lastName};`;
-});
-
-// pre save middleware / hook : will work on create() save()
-studentSchema.pre('save', async function (next) {
-  // console.log(this, 'pre hook: we will save the data');
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-  // hashing password and save into DB
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds),
-  );
-  next();
-});
-
-// post save middleware/ hook
-studentSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
 });
 
 // Query middleware
@@ -204,11 +179,5 @@ studentSchema.statics.isUserExists = async function (id: string) {
 
   return existingUser;
 };
-
-// creating a custom instance method
-// studentSchema.methods.isUserExists = async function (id: string) {
-//   const exitsingUser = await Student.findOne({ id });
-//   return exitsingUser;
-// };
 
 export const Student = model<TStudent, StudentModel>('Student', studentSchema);
