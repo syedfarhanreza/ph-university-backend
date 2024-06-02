@@ -5,7 +5,7 @@ import {
   TStudent,
   StudentModel,
   TUsername,
-  TlocalGuardian,
+  TLocalGuardian,
 } from './student.interface';
 
 const userNameSchema = new Schema<TUsername>({
@@ -70,7 +70,7 @@ const guardianSchema = new Schema<TGuardian>({
   },
 });
 
-const localGuardianSchema = new Schema<TlocalGuardian>({
+const localGuardianSchema = new Schema<TLocalGuardian>({
   name: {
     type: String,
     trim: true,
@@ -144,6 +144,10 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartment',
     },
   },
   {
