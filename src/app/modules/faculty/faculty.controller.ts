@@ -10,21 +10,20 @@ const getSingleFaculty = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Faculty is retrieved successfully',
+    message: 'Faculty is retrieved succesfully',
     data: result,
   });
 });
 
 const getAllFaculties = catchAsync(async (req, res) => {
-  console.log(req.cookies);
-
   const result = await FacultyServices.getAllFacultiesFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Faculties are retrieved successfully',
-    data: result,
+    message: 'Faculties are retrieved succesfully',
+    meta: result.meta,
+    data: result.result,
   });
 });
 
@@ -36,7 +35,7 @@ const updateFaculty = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Faculty is updated successfully',
+    message: 'Faculty is updated succesfully',
     data: result,
   });
 });
@@ -48,7 +47,7 @@ const deleteFaculty = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Faculty is deleted successfully',
+    message: 'Faculty is deleted succesfully',
     data: result,
   });
 });

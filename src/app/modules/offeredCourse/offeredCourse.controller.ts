@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
-import { OfferedCourseServices } from './offeredCourse.service';
+import { OfferedCourseServices } from './OfferedCourse.service';
 
 const createOfferedCourse = catchAsync(async (req: Request, res: Response) => {
   const result = await OfferedCourseServices.createOfferedCourseIntoDB(
@@ -17,25 +17,46 @@ const createOfferedCourse = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllOfferedCourses = catchAsync(async (req: Request, res: Response) => {
-  //   const result =
-  //   sendResponse(res, {
-  //     statusCode: httpStatus.OK,
-  //     success: true,
-  //     message: 'OfferedCourses retrieved successfully !',
-  //     data: result,
-  //   });
+  const result = await OfferedCourseServices.getAllOfferedCoursesFromDB(
+    req.query,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'OfferedCourses retrieved successfully !',
+    meta: result.meta,
+    data: result.result,
+  });
+});
+
+const getMyOfferedCourses = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user.userId;
+  const result = await OfferedCourseServices.getMyOfferedCoursesFromDB(
+    userId,
+    req.query,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'OfferedCourses retrieved successfully !',
+    meta: result.meta,
+    data: result.result,
+  });
 });
 
 const getSingleOfferedCourses = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    //   const result =
-    //   sendResponse(res, {
-    //     statusCode: httpStatus.OK,
-    //     success: true,
-    //     message: 'OfferedCourse fetched successfully',
-    //     data: result,
-    //   });
+    const result = await OfferedCourseServices.getSingleOfferedCourseFromDB(id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'OfferedCourse fetched successfully',
+      data: result,
+    });
   },
 );
 
@@ -70,6 +91,7 @@ const deleteOfferedCourseFromDB = catchAsync(
 export const OfferedCourseControllers = {
   createOfferedCourse,
   getAllOfferedCourses,
+  getMyOfferedCourses,
   getSingleOfferedCourses,
   updateOfferedCourse,
   deleteOfferedCourseFromDB,

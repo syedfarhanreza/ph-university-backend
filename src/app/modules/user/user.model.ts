@@ -1,11 +1,18 @@
-import { Schema, model } from 'mongoose';
-import { TUser, UserModel } from './user.interface';
-import config from '../../config';
+/* eslint-disable @typescript-eslint/no-this-alias */
 import bcrypt from 'bcrypt';
+import { Schema, model } from 'mongoose';
+import config from '../../config';
+import { UserStatus } from './user.constant';
+import { TUser, UserModel } from './user.interface';
 
 const userSchema = new Schema<TUser, UserModel>(
   {
     id: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    email: {
       type: String,
       required: true,
       unique: true,
@@ -24,11 +31,11 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ['admin', 'student', 'faculty'],
+      enum: ['superAdmin', 'student', 'faculty', 'admin'],
     },
     status: {
       type: String,
-      enum: ['in-progress', 'blocked'],
+      enum: UserStatus,
       default: 'in-progress',
     },
     isDeleted: {
@@ -43,7 +50,7 @@ const userSchema = new Schema<TUser, UserModel>(
 
 userSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
+  const user = this; // doc
   // hashing password and save into DB
   user.password = await bcrypt.hash(
     user.password,
@@ -58,7 +65,7 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-userSchema.statics.isUserExitsByCustomId = async function (id: string) {
+userSchema.statics.isUserExistsByCustomId = async function (id: string) {
   return await User.findOne({ id }).select('+password');
 };
 

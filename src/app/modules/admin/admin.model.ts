@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { AdminModel, TAdmin, TUserName } from './admin.interface';
 import { BloodGroup, Gender } from './admin.constant';
+import { AdminModel, TAdmin, TUserName } from './admin.interface';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -61,7 +61,7 @@ const adminSchema = new Schema<TAdmin, AdminModel>(
       type: String,
       required: [true, 'Emergency contact number is required'],
     },
-    bloodGroup: {
+    bloogGroup: {
       type: String,
       enum: {
         values: BloodGroup,
@@ -76,7 +76,7 @@ const adminSchema = new Schema<TAdmin, AdminModel>(
       type: String,
       required: [true, 'Permanent address is required'],
     },
-    profileImg: { type: String },
+    profileImg: { type: String, default: '' },
     isDeleted: {
       type: Boolean,
       default: false,
